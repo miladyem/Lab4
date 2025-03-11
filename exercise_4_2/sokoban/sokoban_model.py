@@ -29,9 +29,11 @@ class SokobanModel:
         self.boxes = set()
         self.goals = set()
 
-        # We'll assume the level data is well formed (all lines are the
-        # same length).
+        # We'll assume the level data is well formed (all lines are the same length).
         self.size = [len(level_data[0].strip()), len(level_data)]
+
+        # Ajout : Stocke les données initiales du niveau
+        self.initial_data = level_data  # Stocke les données initiales du niveau
 
         for y, row in enumerate(level_data):
             for x, symbol in enumerate(row.strip()):
@@ -53,6 +55,36 @@ class SokobanModel:
                         self.walls.add(pos)
                     # Anything that's not a goal/player/box/wall is implied to
                     # be a floor. We don't keep track of floors.
+
+    # Ajout : Méthode pour réinitialiser le niveau à son état initial
+    def reset_level(self, level_data):
+        """Réinitialise le niveau à son état initial"""
+        self.walls = set()
+        self.boxes = set()
+        self.goals = set()
+
+        # Réinitialisation de la taille du niveau
+        self.size = [len(level_data[0].strip()), len(level_data)]
+
+        for y, row in enumerate(level_data):
+            for x, symbol in enumerate(row.strip()):
+                pos = (x, y)
+                match symbol:
+                    case Symbol.BOX.value:
+                        self.boxes.add(pos)
+                    case Symbol.BOX_ON_GOAL.value:
+                        self.boxes.add(pos)
+                        self.goals.add(pos)
+                    case Symbol.PLAYER.value:
+                        self.player = pos
+                    case Symbol.PLAYER_ON_GOAL.value:
+                        self.player = pos
+                        self.goals.add(pos)
+                    case Symbol.GOAL.value:
+                        self.goals.add(pos)
+                    case Symbol.WALL.value:
+                        self.walls.add(pos)
+    
 
     def is_empty(self, x, y):
         pos = (x, y)
